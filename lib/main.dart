@@ -1,20 +1,32 @@
+import 'dart:io';
+
+import 'package:appambit_sdk_flutter/appambit_sdk_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+import 'app.dart';
+import 'app_services.dart';
+import 'core/appambit/analytics.dart';
+import 'core/appambit/cloud_service.dart';
+import 'core/appambit/db_service.dart';
+import 'core/local_store.dart';
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  await dotenv.load();
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
+  // One AppAmbit app per platform; both share the ShopListDb database.
+  final appKey = Platform.isIOS ? dotenv.env['APPAMBIT_IOS_APP_KEY'] : dotenv.env['APPAMBIT_ANDROID_APP_KEY'];
+  if (appKey != null && appKey.isNotEmpty) await AppAmbitSdk.start(appKey: appKey);
+
+  final services = AppServices(
+    db: const AppAmbitDbService(),
+    cloud: const AppAmbitCloudService(),
+    analytics: const AppAmbitAnalytics(),
+    store: await LocalStore.open(),
+    platform: Platform.isIOS ? 'ios' : 'android',
+  );
+  runApp(App(services: services));
 }

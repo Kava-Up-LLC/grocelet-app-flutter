@@ -1,5 +1,5 @@
 name: app_shoplist
-description: "A new Flutter project."
+description: "ShopList — the whole house's grocery list, on AppAmbit."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -7,8 +7,12 @@ environment:
   sdk: ^3.11.0
 
 dependencies:
+  appambit_sdk_flutter: ^1.2.1
   flutter:
     sdk: flutter
+  flutter_dotenv: ^6.0.2
+  shared_preferences: ^2.5.6
+  uuid: ^4.6.0
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +21,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env
+  fonts:
+    - family: BricolageGrotesque
+      fonts:
+        - asset: assets/fonts/BricolageGrotesque-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/BricolageGrotesque-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/BricolageGrotesque-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/BricolageGrotesque-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/BricolageGrotesque-ExtraBold.ttf
+          weight: 800
