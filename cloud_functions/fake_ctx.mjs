@@ -6,13 +6,13 @@ CREATE TABLE houses (id TEXT PRIMARY KEY, code TEXT NOT NULL UNIQUE, shopper_id 
 CREATE TABLE members (id TEXT PRIMARY KEY, house_id TEXT NOT NULL REFERENCES houses(id), nickname TEXT NOT NULL, platform TEXT NOT NULL CHECK (platform IN ('ios','android')), consumer_id INTEGER, created_at TEXT NOT NULL DEFAULT (datetime('now')));
 CREATE TABLE items (id TEXT PRIMARY KEY, house_id TEXT NOT NULL REFERENCES houses(id), name TEXT NOT NULL, quantity TEXT, checked INTEGER NOT NULL DEFAULT 0, added_by TEXT NOT NULL REFERENCES members(id), created_at TEXT NOT NULL DEFAULT (datetime('now')));`;
 
-export const fakeCtx = ({ db = new DatabaseSync(':memory:'), body = {}, consumer = null, pushFails = false } = {}) => {
+export const fakeCtx = ({ db = new DatabaseSync(':memory:'), body = {}, consumer = null, pushFails = false, secrets = {} } = {}) => {
   if (!db.__ready) { db.exec(SCHEMA); db.__ready = true; }
   const pushes = [];
   return {
     db, pushes,
     ctx: {
-      req: { body }, consumer, log: () => {},
+      req: { body }, consumer, secrets, log: () => {},
       appambit: {
         db: async (sql, params = []) => {
           const st = db.prepare(sql);

@@ -23,7 +23,8 @@ class AppAmbitCloudService implements CloudService {
   Future<Map<String, dynamic>> call(String function, Map<String, dynamic> body) async {
     final CloudCodeResponse response;
     try {
-      response = await CloudCode.call(function, body: body, timeout: const Duration(seconds: 15)).future;
+      // 30 s: start_shopping waits for AppAmbit push, which takes ~8–10 s per send (measured 2026-11-17).
+      response = await CloudCode.call(function, body: body, timeout: const Duration(seconds: 30)).future;
     } on CloudCodeError catch (e) {
       throw AppFailure(_networkCodes.contains(e.code) ? FailureKind.noConnection : FailureKind.unexpected, e);
     } catch (e) {
