@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'fakes.dart';
 
 Future<AppServices> services(FakeDb db, {bool withHouse = false}) async {
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues({'asked_notifications': true});
   final store = await LocalStore.open();
   if (withHouse) {
     await store.saveSession(HouseSession(houseId: 'h1', code: 'KTMRQW', nickname: 'Ana', memberId: store.memberId));
@@ -18,6 +18,7 @@ Future<AppServices> services(FakeDb db, {bool withHouse = false}) async {
     db: db,
     cloud: FakeCloud((_, _) => {'ok': true, 'house_id': 'h1', 'code': 'KTMRQW'}),
     analytics: FakeAnalytics(),
+    push: FakePush(),
     store: store,
     platform: 'ios',
   );
@@ -61,5 +62,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text("No connection. Changes can't be saved right now."), findsOneWidget);
     expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets("nobody shopping shows I'm at the store; Leo shopping shows his card and New", (tester) async {
+    final db = FakeDb()..rows = [itemRow('1', 'Eggs')];
+    await tester.pumpWidget(App(services: await services(db, withHouse: true)));
+    await tester.pumpAndSettle();
+    expect(find.text("I'm at the store"), findsOneWidget);
+
+    final since = DateTime.now().toUtc().subtract(const Duration(minutes: 5));
+    String db_(DateTime t) => t.toIso8601String().substring(0, 19).replaceFirst('T', ' ');
+    db.house = {'shopper_id': 'leo', 'shopping_since': db_(since)};
+    db.rows = [itemRow('1', 'Eggs', at: db_(since.subtract(const Duration(hours: 1)))), itemRow('2', 'Milk', qty: '2', at: db_(since.add(const Duration(minutes: 2))))];
+    await tester.drag(find.text('Eggs'), const Offset(0, 300));
+    await tester.pumpAndSettle();
+    expect(find.text('Leo is at the store'), findsOneWidget);
+    expect(find.text('New'), findsOneWidget);
+    expect(find.text("I'm at the store"), findsNothing);
   });
 }

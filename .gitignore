@@ -49,3 +49,6 @@ app.*.map.json
 
 # Local docs (not versioned)
 /docs/
+
+# Firebase config (per developer / per environment)
+android/app/google-services.json

@@ -28,6 +28,11 @@ class LocalStore {
     return HouseSession(houseId: houseId, code: code, nickname: nickname, memberId: memberId);
   }
 
+  /// Whether we already asked for notifications (asked once, never nagged).
+  bool get askedForNotifications => _prefs.getBool('asked_notifications') ?? false;
+
+  Future<void> markAskedForNotifications() => _prefs.setBool('asked_notifications', true);
+
   Future<void> saveSession(HouseSession s) async {
     await _prefs.setString('house_id', s.houseId);
     await _prefs.setString('house_code', s.code);

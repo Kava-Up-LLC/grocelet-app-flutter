@@ -4,12 +4,16 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text.dart';
 import '../../../core/widgets/magnet.dart';
 import '../data/item.dart';
+import 'trip_widgets.dart';
 
 /// A ruled line on the notepad: checkbox, name, quantity, who added it. Swipe left to delete.
 class ItemTile extends StatelessWidget {
-  const ItemTile({super.key, required this.item, required this.onToggle, required this.onDelete});
+  const ItemTile({super.key, required this.item, required this.onToggle, required this.onDelete, this.isNew = false});
 
   final Item item;
+
+  /// Added while someone is at the store.
+  final bool isNew;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
 
@@ -28,7 +32,7 @@ class ItemTile extends StatelessWidget {
       ),
       child: Semantics(
         checked: item.checked,
-        label: [item.name, ?qty].join(', '),
+        label: [item.name, ?qty, if (isNew) 'new'].join(', '),
         excludeSemantics: true,
         onTap: onToggle,
         child: InkWell(
@@ -52,12 +56,14 @@ class ItemTile extends StatelessWidget {
                             decoration: TextDecoration.lineThrough,
                             decorationColor: AppColors.inkMuted,
                           )
-                        : AppText.item,
+                        : isNew
+                            ? AppText.item.copyWith(fontWeight: FontWeight.w700)
+                            : AppText.item,
                   ),
                 ),
                 if (qty != null) ...[const SizedBox(width: 10), Text(qty, style: AppText.meta)],
                 const SizedBox(width: 14),
-                Magnet(color: AppColors.magnetFor(item.addedBy)),
+                isNew ? const NewMagnet() : Magnet(color: AppColors.magnetFor(item.addedBy)),
               ],
             ),
           ),

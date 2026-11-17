@@ -5,8 +5,11 @@ import '../../core/appambit/analytics.dart';
 import '../../core/errors.dart';
 import 'data/item.dart';
 import 'data/list_repository.dart';
+import 'data/list_snapshot.dart';
+import 'data/trip.dart';
 
-/// The shared list. Changes show at once and are undone if the cloud can't save them.
+/// The shared list and the store trip. Changes show at once and are undone if the
+/// cloud can't save them.
 class ListController extends ChangeNotifier {
   ListController({required ListRepository list, required Analytics analytics, required String memberId})
       : _list = list,
@@ -17,17 +20,36 @@ class ListController extends ChangeNotifier {
   final Analytics _analytics;
   final String _memberId;
 
-  List<Item> items = const [];
+  ListSnapshot snapshot = ListSnapshot.empty;
   bool loading = true;
+  bool tripBusy = false;
   AppFailure? failure;
 
+  List<Item> get items => snapshot.items;
+  Trip? get trip => snapshot.trip;
+  bool get iAmShopping => trip?.shopperId == _memberId;
   int get checkedCount => items.where((i) => i.checked).length;
+  bool isNew(Item item) => snapshot.isNew(item);
+
+  /// "Leo and Sam got the alert." for the shopper's card.
+  String get alertedText {
+    final others = [
+      for (final e in snapshot.members.entries)
+        if (e.key != _memberId) e.value,
+    ];
+    return switch (others.length) {
+      0 => 'Nobody else is in the house yet.',
+      1 => '${others[0]} got the alert.',
+      2 => '${others[0]} and ${others[1]} got the alert.',
+      _ => '${others[0]} and ${others.length - 1} others got the alert.',
+    };
+  }
 
   Future<void> load() async {
     failure = null;
     notifyListeners();
     try {
-      items = await _list.load();
+      snapshot = await _list.load();
     } on AppFailure catch (f) {
       failure = f;
     } finally {
@@ -74,16 +96,65 @@ class ListController extends ChangeNotifier {
     if (ok) _analytics.track('checked_cleared', {'count': '$count'});
   }
 
+  /// "I'm at the store". Returns a message to show when someone else got there first.
+  Future<String?> startShopping() async {
+    if (tripBusy) return null;
+    tripBusy = true;
+    failure = null;
+    notifyListeners();
+    try {
+      final result = await _list.startShopping();
+      switch (result) {
+        case TripStarted(:final notified):
+          _analytics.track('shopping_started', {'notified': '$notified'});
+          await _quietReload();
+          return null;
+        case TripTaken(:final shopperName):
+          _analytics.track('shopping_refused');
+          await _quietReload();
+          return '$shopperName is already at the store.';
+      }
+    } on AppFailure catch (f) {
+      failure = f;
+      return null;
+    } finally {
+      tripBusy = false;
+      notifyListeners();
+    }
+  }
+
+  /// Ends my trip: every "New" badge goes away.
+  Future<void> done() async {
+    final before = snapshot;
+    snapshot = ListSnapshot(items: items, trip: null, members: snapshot.members);
+    failure = null;
+    notifyListeners();
+    try {
+      await _list.done();
+      _analytics.track('shopping_done');
+    } on AppFailure catch (f) {
+      snapshot = before;
+      failure = f;
+      notifyListeners();
+    }
+  }
+
+  /// A ShopList notification was tapped.
+  Future<void> openedFromPush() {
+    _analytics.track('push_opened');
+    return refresh();
+  }
+
   Future<bool> _change(List<Item> Function() optimistic, Future<void> Function() save) async {
-    final before = items;
-    items = optimistic();
+    final before = snapshot;
+    snapshot = ListSnapshot(items: optimistic(), trip: snapshot.trip, members: snapshot.members);
     failure = null;
     notifyListeners();
     try {
       await save();
       return true;
     } on AppFailure catch (f) {
-      items = before;
+      snapshot = before;
       failure = f;
       notifyListeners();
       return false;
@@ -92,10 +163,10 @@ class ListController extends ChangeNotifier {
 
   Future<void> _quietReload() async {
     try {
-      items = await _list.load();
+      snapshot = await _list.load();
       notifyListeners();
     } on AppFailure {
-      // The add already succeeded; the next refresh will catch up.
+      // The change already succeeded; the next refresh will catch up.
     }
   }
 }

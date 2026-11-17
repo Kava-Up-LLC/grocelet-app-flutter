@@ -1,6 +1,7 @@
 import 'package:app_shoplist/core/appambit/analytics.dart';
 import 'package:app_shoplist/core/appambit/cloud_service.dart';
 import 'package:app_shoplist/core/appambit/db_service.dart';
+import 'package:app_shoplist/core/appambit/push_service.dart';
 import 'package:app_shoplist/core/errors.dart';
 
 class FakeAnalytics implements Analytics {
@@ -9,15 +10,22 @@ class FakeAnalytics implements Analytics {
   void track(String event, [Map<String, String> properties = const {}]) => events.add(event);
 }
 
-/// Answers SQL by its first word; records writes. Set [offline] to fail everything.
+/// Answers SQL by its table; records writes. Set [offline] to fail everything.
 class FakeDb implements DbService {
   List<DbRow> rows = [];
+  DbRow house = {'shopper_id': null, 'shopping_since': null};
+  List<DbRow> members = [
+    {'id': 'me', 'nickname': 'Ana'},
+    {'id': 'leo', 'nickname': 'Leo'},
+  ];
   final writes = <String>[];
   bool offline = false;
 
   @override
   Future<List<DbRow>> query(String sql, [List<Object?> params = const []]) async {
     if (offline) throw const AppFailure(FailureKind.noConnection);
+    if (sql.contains('FROM houses')) return [house];
+    if (sql.contains('FROM members')) return members;
     return rows;
   }
 
@@ -43,3 +51,21 @@ class FakeCloud implements CloudService {
 
 DbRow itemRow(String id, String name, {String? qty, bool checked = false, String by = 'm1', String at = '2026-11-17 10:00:00'}) =>
     {'id': id, 'name': name, 'quantity': qty, 'checked': checked ? 1 : 0, 'added_by': by, 'created_at': at};
+
+class FakePush implements PushService {
+  bool permission = false;
+  void Function(Map<String, String>)? arrived;
+  void Function(Map<String, String>)? opened;
+
+  @override
+  Future<void> start() async {}
+  @override
+  Future<bool> hasPermission() async => permission;
+  @override
+  Future<bool> requestPermission() async => permission = true;
+  @override
+  void listen({required void Function(Map<String, String> data) onArrived, required void Function(Map<String, String> data) onOpened}) {
+    arrived = onArrived;
+    opened = onOpened;
+  }
+}

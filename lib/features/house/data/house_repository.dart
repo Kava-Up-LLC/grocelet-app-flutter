@@ -21,6 +21,18 @@ class HouseRepository {
   Future<HouseSession> join(String code, String nickname) =>
       _joinHouse(action: 'join', code: code, nickname: nickname);
 
+  /// Joins the saved house again so the cloud has this phone's current AppAmbit
+  /// consumer id (what start_shopping sends the push to). Quiet: failures are ignored.
+  Future<void> refreshMembership() async {
+    final s = current;
+    if (s == null) return;
+    try {
+      await _joinHouse(action: 'join', code: s.code, nickname: s.nickname);
+    } on AppFailure {
+      // Next start will try again.
+    }
+  }
+
   Future<HouseSession> _joinHouse({required String action, required String nickname, String? code}) async {
     final res = await _cloud.call('join_house', {
       'action': action,
@@ -35,9 +47,11 @@ class HouseRepository {
         res['error'],
       );
     }
+    final houseId = res['house_id'], houseCode = res['code'];
+    if (houseId is! String || houseCode is! String) throw const AppFailure(FailureKind.unexpected, 'join_house: bad response');
     final session = HouseSession(
-      houseId: res['house_id'] as String,
-      code: res['code'] as String,
+      houseId: houseId,
+      code: houseCode,
       nickname: nickname,
       memberId: _store.memberId,
     );

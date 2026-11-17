@@ -12,8 +12,9 @@ import '../data/list_repository.dart';
 import '../list_controller.dart';
 import '../widgets/add_item_bar.dart';
 import '../widgets/item_tile.dart';
+import '../widgets/trip_widgets.dart';
 
-/// Home: the house's list on the fridge.
+/// Home: the house's list on the fridge, and the trip to the store.
 class ShoppingListView extends StatefulWidget {
   const ShoppingListView({super.key, required this.services, required this.session});
 
@@ -26,12 +27,18 @@ class ShoppingListView extends StatefulWidget {
 
 class _ShoppingListViewState extends State<ShoppingListView> {
   late final _controller = ListController(
-    list: ListRepository(db: widget.services.db, houseId: widget.session.houseId),
+    list: ListRepository(
+      db: widget.services.db,
+      cloud: widget.services.cloud,
+      houseId: widget.session.houseId,
+      memberId: widget.session.memberId,
+    ),
     analytics: widget.services.analytics,
     memberId: widget.session.memberId,
   );
   final _name = TextEditingController();
   final _quantity = TextEditingController();
+  final _askForNotifications = ValueNotifier(false);
   late final AppLifecycleListener _lifecycle;
 
   @override
@@ -40,6 +47,24 @@ class _ShoppingListViewState extends State<ShoppingListView> {
     _controller.load();
     // "Everyone sees the same list": reload whenever the app comes back to the front.
     _lifecycle = AppLifecycleListener(onResume: _controller.refresh);
+    final push = widget.services.push;
+    push.listen(onArrived: (_) => _controller.refresh(), onOpened: (_) => _controller.openedFromPush());
+    widget.services.houses.refreshMembership();
+    _maybeAskForNotifications();
+  }
+
+  Future<void> _maybeAskForNotifications() async {
+    if (widget.services.store.askedForNotifications) return;
+    if (await widget.services.push.hasPermission()) return;
+    _askForNotifications.value = true;
+  }
+
+  Future<void> _answerNotifications({required bool turnOn}) async {
+    _askForNotifications.value = false;
+    await widget.services.store.markAskedForNotifications();
+    if (!turnOn) return;
+    await widget.services.push.requestPermission();
+    widget.services.houses.refreshMembership(); // the push registration may be new
   }
 
   @override
@@ -48,6 +73,7 @@ class _ShoppingListViewState extends State<ShoppingListView> {
     _controller.dispose();
     _name.dispose();
     _quantity.dispose();
+    _askForNotifications.dispose();
     super.dispose();
   }
 
@@ -59,6 +85,12 @@ class _ShoppingListViewState extends State<ShoppingListView> {
     }
   }
 
+  Future<void> _startShopping() async {
+    final message = await _controller.startShopping();
+    if (message == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,9 +98,10 @@ class _ShoppingListViewState extends State<ShoppingListView> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
           child: ListenableBuilder(
-            listenable: _controller,
+            listenable: Listenable.merge([_controller, _askForNotifications]),
             builder: (context, _) {
               final failure = _controller.failure;
+              final trip = _controller.trip;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -76,6 +109,19 @@ class _ShoppingListViewState extends State<ShoppingListView> {
                   if (failure != null) ...[
                     const SizedBox(height: 18),
                     NoConnectionBanner(message: failure.message, onRetry: _controller.refresh),
+                  ],
+                  if (_askForNotifications.value) ...[
+                    const SizedBox(height: 18),
+                    NotificationsNote(
+                      onTurnOn: () => _answerNotifications(turnOn: true),
+                      onNotNow: () => _answerNotifications(turnOn: false),
+                    ),
+                  ],
+                  if (trip != null) ...[
+                    const SizedBox(height: 18),
+                    _controller.iAmShopping
+                        ? MyTripCard(alerted: _controller.alertedText, onDone: _controller.done)
+                        : SomeoneShoppingCard(name: trip.shopperName),
                   ],
                   const SizedBox(height: 18),
                   Expanded(
@@ -86,6 +132,10 @@ class _ShoppingListViewState extends State<ShoppingListView> {
                   ),
                   const SizedBox(height: 16),
                   AddItemBar(name: _name, quantity: _quantity, onAdd: _add),
+                  if (trip == null) ...[
+                    const SizedBox(height: 14),
+                    StoreButton(onPressed: _startShopping, busy: _controller.tripBusy),
+                  ],
                 ],
               );
             },
@@ -172,6 +222,7 @@ class _ItemsOnPaper extends StatelessWidget {
               ItemTile(
                 key: ValueKey(item.id),
                 item: item,
+                isNew: controller.isNew(item),
                 onToggle: () => controller.toggle(item),
                 onDelete: () => controller.delete(item),
               ),

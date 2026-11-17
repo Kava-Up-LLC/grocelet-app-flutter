@@ -55,4 +55,10 @@ void main() {
     expect(HouseController.validCode('ktmrqw'), isTrue);
     expect(HouseController.validCode('KTMRQ'), isFalse);
   });
+
+  test('a broken cloud answer is a failure, not a crash', () async {
+    final c = controller(FakeCloud((_, _) => {'ok': true}));
+    expect(await c.create('Ana'), isNull);
+    expect(c.failure?.kind, FailureKind.unexpected);
+  });
 }
