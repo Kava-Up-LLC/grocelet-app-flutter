@@ -113,7 +113,7 @@ Sentence case everywhere. **No all-caps text**, no italics.
 | **Checkbox** | 26 px circle. Open: 2 px `pine` ring. Checked: filled `pine` with a white check (2.2 px stroke, round caps). Checked rows: name `inkMuted` + strikethrough. Checked items go to the bottom. |
 | **Member magnet** | 10 px circle in the member's magnet color, right edge of the row. Decorative (`ExcludeSemantics`). |
 | **New magnet** | Pill, `denim` fill, white `magnet` text "New", padding 5×11, rotated **−4°**, inner bottom shade + small drop. Replaces the member magnet on that row; the item name goes to 700. Appears with one short pop (scale 0.6 → 1.0, 220 ms, easeOutBack) the first time it shows; no animation if reduce motion is on. |
-| **Shopping card · someone else** | `paper`, radius 16, drop 2, padding 14×16. 36 px `denim` avatar with the shopper's initial (800, white) · title "Ana is at the store" (`cardTitle`) · subtitle "Add what you need now. She'll see it." (`meta`, `inkMuted`). |
+| **Shopping card · someone else** | `paper`, radius 16, drop 2, padding 14×16. 36 px `denim` avatar with the shopper's initial (800, white) · title "Ana is at the store" (`cardTitle`) · subtitle "Add what you need now. Ana will see it." (we don't know anyone's pronouns) (`meta`, `inkMuted`). |
 | **Shopping card · me** | `denimSoft` fill, radius 16, drop 2 `denimEdge`, padding 12/12/12/16. Title "You're at the store" (18/800 `ink`) · subtitle "Leo and Sam got the alert." (`inkOnSoft`) · **Done** button: `denim` fill, white 16/700, 48 px, radius 12. |
 | **Store button** | Only when nobody is shopping. Full width, 64 px, radius 18, `denim`, drop 4 `denimDeep`, "I'm at the store" 20/800 white. Sits under the notepad. |
 | **Add bar** | Row, gap 8, under the notepad: item field (flexible) · quantity field (64 px wide) · **Add** primary button (56 px, padding 0 22). Fields: `paper`, radius 14, drop 2, no border, text 17/500. Placeholders "Add an item" and "Qty" in `inkMuted`. |
@@ -151,7 +151,7 @@ The add bar shows in every list state; the mockup of "I'm shopping" hides it onl
 | Code | "Your house is ready" · "House code" · "Copy code" · "Code copied" · "Continue" |
 | Join | "Join a house" · "House code" · "Your nickname" · "Join" · "No house with that code. Check the 6 letters with whoever created it." |
 | List | "Add an item" · "Qty" · "Add" · "Clear checked (n)" · "Nothing on the list yet." · "Add the first item below." · "Delete" |
-| Trip | "I'm at the store" · "Ana is at the store" · "Add what you need now. She'll see it." · "You're at the store" · "Leo and Sam got the alert." (1 person: "Leo got the alert."; 3+: "Leo and 2 others got the alert."; nobody: "Nobody else is in the house yet.") · "Done" · "Ana is already at the store." · "New" |
+| Trip | "I'm at the store" · "Ana is at the store" · "Add what you need now. Ana will see it." (we don't know anyone's pronouns) · "You're at the store" · "Leo and Sam got the alert." (1 person: "Leo got the alert."; 3+: "Leo and 2 others got the alert."; nobody: "Nobody else is in the house yet.") · "Done" · "Ana is already at the store." · "New" |
 | Push | Title "ShopList" · body "Ana is at the store. Add what you need." |
 | Offline | "No connection. Changes can't be saved right now." · "Retry" |
 | Permission ask (before the OS prompt, one line on the list) | "Turn on notifications to know when someone is at the store." |

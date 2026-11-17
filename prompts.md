@@ -109,25 +109,32 @@ flutter analyze clean. End with a table "What the agent did": AppAmbit | ShopLis
 Now the reason ShopList exists: telling the house you're at the store.
 
 PUSH
-- Add AppAmbit push notifications on iPhone and Android. Each phone calls join_house again on
-  every start, so its AppAmbit consumer id is always the one start_shopping sends to.
-- Ask for notification permission once, the first time the list opens.
-- With the app open, a ShopList notification reloads the list. Tapping one opens the list.
+- Add appambit_sdk_push_notifications and start it right after the core SDK. On Android it
+  uses Firebase: apply the google-services plugin only when android/app/google-services.json
+  exists, so the app still builds without it. On iOS add the aps-environment entitlement and
+  the remote-notification background mode.
+- Each phone calls join_house again on every start, so start_shopping always has its current
+  AppAmbit consumer id.
+- Ask for notifications once, politely, on the list: "Turn on notifications to know when
+  someone is at the store." with Not now / Turn on. Never ask again.
+- A ShopList notification that arrives with the app open reloads the list. Tapping one opens it.
 
 THE BUTTON
-- Big "I'm at the store" button when nobody is shopping. It calls start_shopping.
-- Someone else shopping: "Ana is shopping". You shopping: "You're at the store" and a Done button.
+- Big denim "I'm at the store" button when nobody is shopping. It calls start_shopping.
+- Someone else shopping: a card "Ana is at the store · Add what you need now. Ana will see it."
+- You shopping: a soft card "You're at the store · Leo and Sam got the alert." with Done.
 - If someone got there first: "Ana is already at the store."
+- A trip older than 3 hours counts as finished.
 
 NEW WHILE SHOPPING
-- Items added after the trip started get a "New" badge on every phone.
-- Done ends the trip and clears every badge.
+- Items added after the trip started get the denim "New" magnet on every phone. It pops in once.
+- Done ends the trip and clears every New.
 
 ANALYTICS
 - shopping_started, shopping_refused, shopping_done, push_opened.
 
-Add tests for the "New" rules and the trip. Then the real test with both phones: the iPhone taps
-"I'm at the store", the Android phone gets the notification and adds "milk", and the iPhone
-pulls to refresh and sees "milk" with "New". End with a table "What the agent did":
-AppAmbit | ShopList app.
+Tests for the New rules, the 3-hour rule, the trip and who got the alert. Then the real test
+with both phones: the iPhone taps "I'm at the store", the Android phone gets the notification
+and adds "milk", the iPhone pulls to refresh and sees "milk" with New. End with a table
+"What the agent did": AppAmbit | ShopList app.
 ```
