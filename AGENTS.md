@@ -32,7 +32,7 @@ Build only what the spec describes. If something is missing or unclear, ask — 
 8. Work on branch **`dev`**. Never commit to `main`. One commit per prompt, clear message.
 9. In UI copy, comments for the video and summaries, don't say "server" — say "AppAmbit" or "the cloud".
 
-10. **Before writing `start_shopping`, confirm how Cloud Code sends a push to specific users** (by the user id set with `AppAmbitSdk.setUserId`) and that one function reaches members on both the iOS and the Android app. Notes from Oct 2026 say push could only be sent from the dashboard. If it isn't possible, stop and report the options — don't fake it.
+10. Push from the cloud: `ctx.appambit.push({ title, body, data, consumer_id })` inside Cloud Code. A member's `consumer_id` is saved by `join_house` from `ctx.consumer.id`. Push credentials (FCM / APNs) must be uploaded in each AppAmbit app first.
 11. Design: match `DESIGN.md` (colors, type, spacing, components). If it doesn't exist yet, ask.
 
 ## Commands
