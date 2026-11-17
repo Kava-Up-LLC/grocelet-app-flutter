@@ -43,6 +43,12 @@ flutter {
     source = "../.."
 }
 
+dependencies {
+    // Firebase Cloud Messaging for AppAmbit push (as the push SDK README asks).
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-messaging")
+}
+
 // Push (AppAmbit uses Firebase Cloud Messaging on Android). Applied only when the Firebase
 // file is there, so the app still builds without it (it just won't get "at the store" alerts).
 if (file("google-services.json").exists()) {
