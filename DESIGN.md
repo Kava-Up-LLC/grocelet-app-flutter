@@ -37,7 +37,7 @@ Three rules:
 | `inkOnSoft` | `#4E5F6E` | Secondary text on denimSoft | 5.2:1 |
 | `glue` | `#DCE4EE` | Notepad top strip (14 px) | — |
 | `butter` | `#F6E6BC` | "No connection" banner background (ink text on it) | ink on butter 9.6:1 |
-| `onColor` | `#FFFFFF` | Text on pine and grape | — |
+| `onColor` | `#FFFFFF` | Text on pine and denim | — |
 
 **Member magnets** (who added an item). Pick by `member_id.hashCode % 4`; no extra data:
 
