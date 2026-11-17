@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#E8EFEC</color>
+    <!-- DESIGN.md "fridge": the app's screen background. Splash and window use it, so there is no white flash. -->
+    <color name="fridge">#E8EFEC</color>
 </resources>

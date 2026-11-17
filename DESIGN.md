@@ -130,6 +130,7 @@ Sentence case everywhere. **No all-caps text**, no italics.
 
 | Screen | Layout (top → bottom) |
 |---|---|
+| **Splash (native)** | `fridge` background, the magnet "g" (app icon art, 140 pt) centered. Android ≤ 11 `launch_background`, Android 12+ `windowSplashScreen*`, iOS `LaunchScreen`. The window behind Flutter is `fridge` too: never a white screen. |
 | **Welcome** | Four member magnets in a row (denim, plum, mustard, teal; 22 px) · "Grocelet" `hero` · "The whole house's grocery list. One list, everyone's phone." `lead`, max width 290. Bottom: **Create a house** (primary) and **Join with a code** (secondary), gap 12. Content starts ~90 px below the top padding. |
 | **Create house** | "Create a house" `title` · field "Your nickname" · **Create** (primary, bottom). |
 | **Your house is ready** | `title` · code card (notepad style with glue strip): "House code" `meta` · code `code` style · **Copy code** (secondary, 48 px) · paragraph "Share this code with the people you live with. They join with it and their nickname. No accounts." · **Continue** (primary, bottom). |
