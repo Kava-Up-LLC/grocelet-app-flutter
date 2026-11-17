@@ -14,6 +14,7 @@ function, Push, Analytics and crash reports. App 02 of the "7 apps in 7 days" se
 | File | Defines |
 |---|---|
 | **`docs/tech/shoplist/tech_shoplist.md`** | Everything: scope (5 features, nothing more), data model, the cloud function, folder structure, how state works, screens, design tokens, acceptance criteria, risks. |
+| `DESIGN.md` | The look: colors, type, spacing, components, screens. |
 | `prompts.md` | The 3 prompts the app is built with, in order. |
 
 Build only what the spec describes. If something is missing or unclear, ask — don't invent features.
@@ -30,6 +31,9 @@ Build only what the spec describes. If something is missing or unclear, ask — 
 7. Never print, paste or commit App Keys, `.env`, `google-services.json` secrets or push credentials.
 8. Work on branch **`dev`**. Never commit to `main`. One commit per prompt, clear message.
 9. In UI copy, comments for the video and summaries, don't say "server" — say "AppAmbit" or "the cloud".
+
+10. **Before writing `start_shopping`, confirm how Cloud Code sends a push to specific users** (by the user id set with `AppAmbitSdk.setUserId`) and that one function reaches members on both the iOS and the Android app. Notes from Oct 2026 say push could only be sent from the dashboard. If it isn't possible, stop and report the options — don't fake it.
+11. Design: match `DESIGN.md` (colors, type, spacing, components). If it doesn't exist yet, ask.
 
 ## Commands
 

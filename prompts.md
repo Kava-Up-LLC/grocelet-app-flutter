@@ -1,63 +1,58 @@
 # The prompts behind ShopList
 
-ShopList is a shared grocery list for everyone in a house. When someone gets to the store they tap
-**"I'm at the store"**, the rest of the house gets a push, and anything they add shows up with a **"New"** badge.
+ShopList is one grocery list for everyone in a house. When someone gets to the store they tap
+**"I'm at the store"**, everyone else gets a notification, and anything they add shows up with a **"New"** badge.
 
-Built with **three prompts** sent to a coding agent (Claude Code) with the **AppAmbit MCP** connected, on branch
-`dev`. Product rules, data, structure and design: [docs/tech/shoplist/tech_shoplist.md](docs/tech/shoplist/tech_shoplist.md).
-Agent rules: [AGENTS.md](AGENTS.md).
+> *As someone who lives with other people, I want one shared grocery list that tells everyone when I'm at the
+> store, so I come home with everything we need.*
+
+The app is built with **three prompts** sent to a coding agent (Claude Code) with the **AppAmbit MCP** connected.
 
 | Step | Where | What it builds |
 |---|---|---|
-| 0 | By hand | AppAmbit apps, App Keys, push credentials, Firebase file |
-| 1 | Agent + AppAmbit MCP | Push check, the database, the cloud function |
-| 2 | Agent, Flutter | The shared list on two phones |
-| 3 | Agent, Flutter | "I'm at the store", the push and the "New" badge |
+| 0 | By hand | The AppAmbit apps, their keys and the push credentials |
+| 1 | Agent + AppAmbit MCP | The database and the cloud function that sends the "at the store" alert |
+| 2 | Agent, Flutter | The house and the shared list on two phones |
+| 3 | Agent, Flutter | "I'm at the store", the notification and the "New" badge |
 
 ---
 
-## 0. By hand (before the agent)
+## 0. By hand
 
-1. AppAmbit dashboard: create **ShopList - iOS** (iOS, Flutter) and **ShopList - Android** (Android, Flutter).
-2. Copy `.env.example` to `.env` and paste both App Keys. Never in the chat.
-3. Firebase: Android app with package **`com.kavaup.shoplist`** → download `google-services.json` →
-   `android/app/google-services.json`. Service-account JSON → AppAmbit **ShopList - Android** → App Info →
-   Push Notifications Credentials.
-4. Apple: App ID **`com.kavaup.shoplist`** with Push Notifications. APNs key `.p8` + Key ID + Team ID →
-   AppAmbit **ShopList - iOS** → App Info → Push Notifications Credentials.
-5. `git checkout dev`.
+1. AppAmbit dashboard: create **ShopList - iOS** and **ShopList - Android** (stack Flutter).
+2. Put both App Keys in `.env` (template `.env.example`). Never in the chat.
+3. Upload the push credentials to each app (App Info → Push Notifications Credentials): FCM service-account JSON
+   for Android, APNs `.p8` key for iOS. App id on both platforms: `com.kavaup.shoplist`.
 
 ---
 
-## 1. Backend in AppAmbit: push check, database, cloud function
+## 1. The backend in AppAmbit
 
 ```text
 Use the AppAmbit MCP to set up the backend for ShopList, a shared grocery list for a house.
-Call get-started-tool first. Work on the two apps "ShopList - iOS" and "ShopList - Android".
-Read docs/tech/shoplist/tech_shoplist.md sections 4, 5, 6 and 11 before you start.
+Call get-started-tool first and work on the apps "ShopList - iOS" and "ShopList - Android".
 
-FIRST, CHECK PUSH. Stop if it fails.
-- Find out how a Cloud Code function can send a push notification to specific users of an app
-  (users identified with AppAmbitSdk.setUserId), and whether one function can reach users on
-  BOTH apps (an iPhone and an Android phone in the same house).
-- Tell me what you found and where you found it (doc or MCP tool). If Cloud Code cannot send a
-  push to specific users, STOP and create nothing. Give me the options instead.
+The idea: people who live together join the same house with a 6-letter code and share one
+list. When someone taps "I'm at the store", everyone else in the house gets a notification,
+and anything added while they shop is marked as new.
 
 DATABASE
-- Create the database ShopListDb and link BOTH apps to it.
-- Create the tables houses, members and items and their indexes exactly as in section 5.
-  Dates always come from the database clock.
+- Create ShopListDb and link BOTH apps to it, so an iPhone and an Android phone share a house.
+- houses: id, code (6 letters, unique), shopper_id, shopping_since, created_at
+- members: id, house_id, nickname, platform, created_at
+- items: id, house_id, name, quantity (optional text), checked, added_by, created_at
+- Ids are uuids. Dates always come from the database clock, never from the phone.
 
-CLOUD CODE
-- Write cloud_functions/start_shopping.mjs as in section 6: one shopper per house at a time
-  (atomic claim, a 3-hour-old trip can be taken over), push to every OTHER member:
-  "Ana is at the store. Add what you need." with data open=list.
-- Write cloud_functions/start_shopping.test.mjs and make it pass with node --test.
-- Deploy it to both apps with an HTTP trigger.
-- Test it for real: a test house with two members, call it twice (second call refused),
-  show me both results, then delete the test rows.
+CLOUD CODE: start_shopping
+- In: house_id and member_id.
+- Only one shopper per house at a time. Claim the trip in a single update; a trip older than
+  3 hours counts as finished. If someone else is shopping, return their nickname and send nothing.
+- Send a push to every OTHER member of the house:
+  "Ana is at the store. Add what you need."  (data: open = list)
+- Deploy it to both apps with an HTTP trigger, with unit tests for the rules above.
+- Test it for real with a test house and two members, then delete the test data.
 
-Commit on dev. End with a table "What the agent did": AppAmbit | ShopList app.
+End with a table "What the agent did": AppAmbit | ShopList app.
 ```
 
 ---
@@ -65,65 +60,63 @@ Commit on dev. End with a table "What the agent did": AppAmbit | ShopList app.
 ## 2. The app: one list for the whole house
 
 ```text
-Build the ShopList Flutter app on branch dev, following docs/tech/shoplist/tech_shoplist.md
-and AGENTS.md. Read sections 2, 3, 5, 7, 8 and 9 first.
+Build the ShopList Flutter app for iPhone and Android on AppAmbit. Follow AGENTS.md and match
+DESIGN.md exactly. App id com.kavaup.shoplist, display name ShopList. Screens in English.
 
-SETUP
-- Bundle id com.kavaup.shoplist on Android and iOS, display name ShopList.
-- Packages from section 3 only. Hanken Grotesk from ../quote_generator_app/assets/fonts.
-- Start the AppAmbit SDK with the per-platform key from .env.
-- The folder structure of section 7.1, exactly.
+KEEP IT SIMPLE
+- No state-management packages: one controller per feature that extends ChangeNotifier, and
+  views that rebuild with ListenableBuilder. No setState for app data.
+- Two features (house, list). All AppAmbit calls in one core folder.
 
-STATE, NO PACKAGES
-- No provider, riverpod or bloc. One controller per feature that extends ChangeNotifier,
-  views rebuild with ListenableBuilder, no setState for app data (section 7.2).
+HOUSE BY CODE (no login)
+- Welcome: "Create a house" or "Join with a code".
+- Create: your nickname, then the 6-letter code big with a Copy button.
+- Join: code + nickname. Wrong code: "No house with that code."
+- The phone remembers its house. Start AppAmbit with the key from .env.
 
-FEATURES (only these)
-- House by code: Welcome, Create house (nickname, then the 6-letter code big with Copy),
-  Join house (code + nickname). One house per phone, saved locally.
-- Shared list: add (name + optional quantity), check off, swipe to delete, Clear checked.
-  Reload on open, on resume and on pull to refresh.
-- Online only: any network failure shows the red "No connection" banner with Retry.
-- Analytics events from section 8.
+THE SHARED LIST
+- Add an item (name + optional quantity), check it off, swipe to delete.
+- "Clear checked" removes everything already bought.
+- Everyone in the house sees the same list: it reloads when the app opens, when it comes back
+  to the front, and on pull to refresh.
 
-DESIGN
-- Tokens and screens of sections 7.3 and 7.4. Clean, consistent, all in English.
+ONLINE ONLY
+- No internet: a "No connection" banner with Retry. Nothing is saved for later.
 
-TESTS
-- Controller tests with fake repositories, as listed in section 7.1. flutter analyze clean.
+ANALYTICS
+- house_created, house_joined, item_added, item_checked, item_deleted, checked_cleared.
 
-Then run it on my iPhone and my Android phone and tell me the steps to check that an item
-added on one shows up on the other. Commit on dev. End with the table
-"What the agent did": AppAmbit | ShopList app.
+Add tests for the controllers, run it on my iPhone and my Android phone, and check that an item
+added on one shows up on the other. End with a table "What the agent did": AppAmbit | ShopList app.
 ```
 
 ---
 
-## 3. "I'm at the store": the push and the New badge
+## 3. "I'm at the store"
 
 ```text
-Add the store trip to ShopList on branch dev, following docs/tech/shoplist/tech_shoplist.md
-sections 2, 4, 6 and 7.3. Use the push approach confirmed in prompt 1.
+Now the reason ShopList exists: telling the house you're at the store.
 
-PUSH IN THE APP
-- appambit_sdk_push_notifications on iOS and Android, started after the SDK.
-- AppAmbitSdk.setUserId(member_id) on every start.
-- Ask for notification permission once, the first time the List screen opens.
-- A ShopList push with the app open reloads the list; tapping one opens the list.
+PUSH
+- Add AppAmbit push notifications on iPhone and Android. Each phone sets its member id as the
+  AppAmbit user id, so the start_shopping function can reach it.
+- Ask for notification permission once, the first time the list opens.
+- With the app open, a ShopList notification reloads the list. Tapping one opens the list.
 
-THE STORE BUTTON
-- Big "I'm at the store" button when nobody is shopping. It calls the start_shopping function.
-- Someone else shopping: "Ana is shopping". Me shopping: "You're at the store" + Done.
-- Refused because someone else is already shopping: show "Ana is already at the store."
+THE BUTTON
+- Big "I'm at the store" button when nobody is shopping. It calls start_shopping.
+- Someone else shopping: "Ana is shopping". You shopping: "You're at the store" and a Done button.
+- If someone got there first: "Ana is already at the store."
 
 NEW WHILE SHOPPING
-- Items created after shopping_since get the yellow "New" badge on every phone.
-- Done clears the trip and every badge. A trip older than 3 hours counts as finished.
+- Items added after the trip started get a "New" badge on every phone.
+- Done ends the trip and clears every badge.
 
-TESTS
-- Item.isNew rules (including the 3-hour expiry) and the controller's shopping flow.
+ANALYTICS
+- shopping_started, shopping_refused, shopping_done, push_opened.
 
-Then the real test with both phones: the iPhone taps "I'm at the store", the Android phone
-gets the push and adds "milk", the iPhone pulls to refresh and sees "milk" with New.
-Commit on dev. End with the table "What the agent did": AppAmbit | ShopList app.
+Add tests for the "New" rules and the trip. Then the real test with both phones: the iPhone taps
+"I'm at the store", the Android phone gets the notification and adds "milk", and the iPhone
+pulls to refresh and sees "milk" with "New". End with a table "What the agent did":
+AppAmbit | ShopList app.
 ```
