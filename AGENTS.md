@@ -41,7 +41,7 @@ Build only what the spec describes. If something is missing or unclear, ask — 
 flutter pub get
 flutter analyze
 flutter test
-node --test cloud_functions/
+node --test cloud_functions/*.test.mjs
 flutter run -d <device>          # flutter devices
 flutter build apk --debug
 flutter build ios --debug --no-codesign

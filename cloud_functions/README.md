@@ -18,5 +18,5 @@ trigger of the same name. Both apps share the database **ShopListDb**.
 Tests run against a real in-memory SQLite with the same schema:
 
 ```bash
-node --test cloud_functions/
+node --test cloud_functions/*.test.mjs
 ```
