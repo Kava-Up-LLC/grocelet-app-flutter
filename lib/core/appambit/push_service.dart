@@ -19,6 +19,12 @@ class AppAmbitPushService implements PushService {
   Future<void> start() async {
     try {
       await PushNotificationsSdk.start();
+      // Android: start() boots push with delivery off, and the OS permission alone doesn't
+      // tell AppAmbit this device can receive. Turn it on whenever permission is granted
+      // (also covers permission given from system Settings). Safe to repeat.
+      if (await PushNotificationsSdk.hasNotificationPermission()) {
+        await PushNotificationsSdk.setNotificationsEnabled(true);
+      }
     } catch (_) {
       // No push credentials on this build (e.g. Android without google-services.json):
       // the list still works, it just won't get "at the store" alerts.
@@ -38,7 +44,10 @@ class AppAmbitPushService implements PushService {
   Future<bool> requestPermission() async {
     try {
       await PushNotificationsSdk.requestNotificationPermission();
-      return await PushNotificationsSdk.hasNotificationPermission();
+      final granted = await PushNotificationsSdk.hasNotificationPermission();
+      // Registers this device in AppAmbit as push-enabled (see start()).
+      if (granted) await PushNotificationsSdk.setNotificationsEnabled(true);
+      return granted;
     } catch (_) {
       return false;
     }
