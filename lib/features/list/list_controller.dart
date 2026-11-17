@@ -139,7 +139,7 @@ class ListController extends ChangeNotifier {
     }
   }
 
-  /// A ShopList notification was tapped.
+  /// A Grocelet notification was tapped.
   Future<void> openedFromPush() {
     _analytics.track('push_opened');
     return refresh();

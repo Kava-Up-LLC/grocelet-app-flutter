@@ -1,4 +1,4 @@
-// Test helper: a ctx like AppAmbit's, backed by a real in-memory SQLite with ShopList's schema.
+// Test helper: a ctx like AppAmbit's, backed by a real in-memory SQLite with Grocelet's schema (ShopListDb).
 import { DatabaseSync } from 'node:sqlite';
 
 export const SCHEMA = `

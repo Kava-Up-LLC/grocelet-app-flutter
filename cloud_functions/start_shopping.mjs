@@ -46,7 +46,7 @@ export const handler = async (ctx) => {
   for (const { consumer_id: consumerId } of others) {
     try {
       await ctx.appambit.push({
-        title: 'ShopList',
+        title: 'Grocelet',
         body: message(me.nickname),
         data: { open: 'list', house_id: String(houseId) },
         consumer_id: Number(consumerId),

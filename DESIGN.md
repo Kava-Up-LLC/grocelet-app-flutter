@@ -1,11 +1,11 @@
-# DESIGN.md — ShopList · "Fridge Door"
+# DESIGN.md — Grocelet · "Fridge Door"
 
-The look of ShopList. Match it exactly: colors, type, spacing, components and screens.
+The look of Grocelet. Match it exactly: colors, type, spacing, components and screens.
 Reference mockups (9 screens): https://claude.ai/artifact/SnmYxYmw2F8495Y6yzhRQJ — row **A · Fridge Door**.
 
 ## 1. The idea
 
-ShopList is the list that used to live on the fridge door. The screen is the **fridge** (pale enamel green), the list
+Grocelet is the list that used to live on the fridge door. The screen is the **fridge** (pale enamel green), the list
 is a **notepad** stuck on it (white paper, ruled lines, a lavender glue strip on top), and the people in the house are
 **magnets** (round color dots). The trip to the store has its own color: it paints the "I'm at the store"
 button, the "You're at the store" card and the **New** magnet. The trip color is **denim**: a calm, muted blue.
@@ -77,8 +77,8 @@ flutter:
 
 | Style | Size / line height | Weight | Letter spacing | Use |
 |---|---|---|---|---|
-| `hero` | 56 / 0.95 | 800 | −1.7 (−0.03 em) | "ShopList" on Welcome only |
-| `title` | 30 / 1.1 | 800 | −0.6 (−0.02 em) | Screen titles, "ShopList" header |
+| `hero` | 56 / 0.95 | 800 | −1.7 (−0.03 em) | "Grocelet" on Welcome only |
+| `title` | 30 / 1.1 | 800 | −0.6 (−0.02 em) | Screen titles, "Grocelet" header |
 | `code` | 44 / 1.0 | 800 | +9.7 (0.22 em) | The house code on "Your house is ready" |
 | `lead` | 20 / 1.35 | 400 | 0 | Welcome subtitle |
 | `item` | 18 / 1.3 | 500 | 0 | Item name (700 when New) |
@@ -130,11 +130,11 @@ Sentence case everywhere. **No all-caps text**, no italics.
 
 | Screen | Layout (top → bottom) |
 |---|---|
-| **Welcome** | Four member magnets in a row (denim, plum, mustard, teal; 22 px) · "ShopList" `hero` · "The whole house's grocery list. One list, everyone's phone." `lead`, max width 290. Bottom: **Create a house** (primary) and **Join with a code** (secondary), gap 12. Content starts ~90 px below the top padding. |
+| **Welcome** | Four member magnets in a row (denim, plum, mustard, teal; 22 px) · "Grocelet" `hero` · "The whole house's grocery list. One list, everyone's phone." `lead`, max width 290. Bottom: **Create a house** (primary) and **Join with a code** (secondary), gap 12. Content starts ~90 px below the top padding. |
 | **Create house** | "Create a house" `title` · field "Your nickname" · **Create** (primary, bottom). |
 | **Your house is ready** | `title` · code card (notepad style with glue strip): "House code" `meta` · code `code` style · **Copy code** (secondary, 48 px) · paragraph "Share this code with the people you live with. They join with it and their nickname. No accounts." · **Continue** (primary, bottom). |
 | **Join a house** | **Back** text button · "Join a house" `title` · field "House code" (auto uppercase, 6 letters, letter spacing 0.2 em, 700) · field "Your nickname" · **Join** (primary, bottom). Wrong code: denim ring on the code field + inline note "No house with that code. Check the 6 letters with whoever created it." |
-| **List · nobody shopping** | Header ("ShopList" `title` + code chip) · notepad · **I'm at the store** store button. |
+| **List · nobody shopping** | Header ("Grocelet" `title` + code chip) · notepad · **I'm at the store** store button. |
 | **List · someone else shopping** | Header · shopping card (someone else) · notepad (New magnets on new items) · add bar. No store button. |
 | **List · I'm shopping** | Header · shopping card (me, with Done) · notepad with New magnets · add bar. |
 | **List · no connection** | Same as the state underneath, plus the banner under the header. |
@@ -146,13 +146,13 @@ The add bar shows in every list state; the mockup of "I'm shopping" hides it onl
 
 | Where | Text |
 |---|---|
-| Welcome | "ShopList" · "The whole house's grocery list. One list, everyone's phone." · "Create a house" · "Join with a code" |
+| Welcome | "Grocelet" · "The whole house's grocery list. One list, everyone's phone." · "Create a house" · "Join with a code" |
 | Create | "Create a house" · "Your nickname" · "Create" |
 | Code | "Your house is ready" · "House code" · "Copy code" · "Code copied" · "Continue" |
 | Join | "Join a house" · "House code" · "Your nickname" · "Join" · "No house with that code. Check the 6 letters with whoever created it." |
 | List | "Add an item" · "Qty" · "Add" · "Clear checked (n)" · "Nothing on the list yet." · "Add the first item below." · "Delete" |
 | Trip | "I'm at the store" · "Ana is at the store" · "Add what you need now. Ana will see it." (we don't know anyone's pronouns) · "You're at the store" · "Leo and Sam got the alert." (1 person: "Leo got the alert."; 3+: "Leo and 2 others got the alert."; nobody: "Nobody else is in the house yet.") · "Done" · "Ana is already at the store." · "New" |
-| Push | Title "ShopList" · body "Ana is at the store. Add what you need." |
+| Push | Title "Grocelet" · body "Ana is at the store. Add what you need." |
 | Offline | "No connection. Changes can't be saved right now." · "Retry" |
 | Permission ask (before the OS prompt, one line on the list) | "Turn on notifications to know when someone is at the store." |
 

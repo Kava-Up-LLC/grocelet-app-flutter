@@ -155,7 +155,7 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Semantics(header: true, child: const Text('ShopList', style: AppText.title))),
+        Expanded(child: Semantics(header: true, child: const Text('Grocelet', style: AppText.title))),
         Semantics(
           button: true,
           label: 'Copy house code ${code.split('').join(' ')}',

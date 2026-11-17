@@ -1,4 +1,4 @@
-package com.kavaup.shoplist
+package com.kavaup.grocelet
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,4 +1,4 @@
-# AGENTS.md — app_shoplist (ShopList)
+# AGENTS.md — app_shoplist (Grocelet)
 
 Guide for any coding agent (Claude Code, Codex, Cursor…) working in this repo. Read it first.
 Behavioral guidelines in the parent `../CLAUDE.md` (apps_cms) apply here too: think first, keep it simple,
@@ -6,7 +6,7 @@ touch only what you must, verify.
 
 ## What this is
 
-ShopList — the whole house's grocery list. A Flutter app (iOS + Android) on AppAmbit: Database, one Cloud Code
+Grocelet — the whole house's grocery list. A Flutter app (iOS + Android) on AppAmbit: Database, one Cloud Code
 function, Push, Analytics and crash reports. App 02 of the "7 apps in 7 days" series.
 
 ## Source of truth
@@ -58,5 +58,5 @@ Those apps use Riverpod and go_router; **this one doesn't**. Take the SDK knowle
 
 ## After each prompt
 
-End with a short table: **What the agent did** — one column for **AppAmbit**, one for **the ShopList app** — in plain
+End with a short table: **What the agent did** — one column for **AppAmbit**, one for **the Grocelet app** — in plain
 words, with counts (tables, functions, screens, tests). It goes on screen in the video.

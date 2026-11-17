@@ -14,7 +14,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     final session = services.houses.current;
     return MaterialApp(
-      title: 'ShopList',
+      title: 'Grocelet',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: session == null

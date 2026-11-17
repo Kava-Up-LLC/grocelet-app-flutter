@@ -1,6 +1,6 @@
-# Cloud Code — ShopList
+# Cloud Code — Grocelet
 
-Two functions on AppAmbit Cloud Code, deployed to **both** apps (ShopList iOS and ShopList Android) with an HTTP
+Two functions on AppAmbit Cloud Code, deployed to **both** apps ("App ShopList - ios" and "App ShopList - Android" in AppAmbit) with an HTTP
 trigger of the same name. Both apps share the database **ShopListDb**.
 
 | Function | In | Out |

@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'house_session.dart';
 
-/// The only things ShopList keeps on the phone: who this phone is, and its house.
+/// The only things Grocelet keeps on the phone: who this phone is, and its house.
 class LocalStore {
   LocalStore(this._prefs);
 

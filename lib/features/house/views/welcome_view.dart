@@ -32,7 +32,7 @@ class WelcomeView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              Semantics(header: true, child: const Text('ShopList', style: AppText.hero)),
+              Semantics(header: true, child: const Text('Grocelet', style: AppText.hero)),
               const SizedBox(height: 20),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 290),

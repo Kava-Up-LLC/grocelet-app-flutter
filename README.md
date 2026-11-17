@@ -1,4 +1,4 @@
-# ShopList
+# Grocelet
 
 The whole house's grocery list — built on AppAmbit in three prompts.
 

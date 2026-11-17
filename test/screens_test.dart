@@ -27,7 +27,7 @@ Future<AppServices> services(FakeDb db, {bool withHouse = false}) async {
 void main() {
   testWidgets('no house yet: Welcome with Create and Join', (tester) async {
     await tester.pumpWidget(App(services: await services(FakeDb())));
-    expect(find.text('ShopList'), findsOneWidget);
+    expect(find.text('Grocelet'), findsOneWidget);
     expect(find.text('Create a house'), findsOneWidget);
     expect(find.text('Join with a code'), findsOneWidget);
   });

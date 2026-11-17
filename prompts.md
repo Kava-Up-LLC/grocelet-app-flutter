@@ -1,6 +1,6 @@
-# The prompts behind ShopList
+# The prompts behind Grocelet
 
-ShopList is one grocery list for everyone in a house. When someone gets to the store they tap
+Grocelet is one grocery list for everyone in a house. When someone gets to the store they tap
 **"I'm at the store"**, everyone else gets a notification, and anything they add shows up with a **"New"** badge.
 
 > *As someone who lives with other people, I want one shared grocery list that tells everyone when I'm at the
@@ -22,14 +22,14 @@ The app is built with **three prompts** sent to a coding agent (Claude Code) wit
 1. AppAmbit dashboard: create **App ShopList - ios** and **App ShopList - Android** (stack Flutter).
 2. Put both App Keys in `.env` (template `.env.example`). Never in the chat.
 3. Upload the push credentials to each app (App Info → Push Notifications Credentials): FCM service-account JSON
-   for Android, APNs `.p8` key for iOS. App id on both platforms: `com.kavaup.shoplist`.
+   for Android, APNs `.p8` key for iOS. App id on both platforms: `com.kavaup.grocelet`.
 
 ---
 
 ## 1. The backend in AppAmbit
 
 ```text
-Use the AppAmbit MCP to set up the backend for ShopList, a shared grocery list for a house.
+Use the AppAmbit MCP to set up the backend for Grocelet, a shared grocery list for a house.
 Call get-started-tool first and work on the apps "App ShopList - ios" and "App ShopList - Android".
 
 The idea: people who live together join the same house with a 6-letter code and share one
@@ -54,7 +54,7 @@ CLOUD CODE (deploy each function to both apps, HTTP trigger with the same name)
 - Unit tests for both against a real in-memory SQLite with the same schema.
 - Then run both for real with a test house and two members, and delete the test data.
 
-End with a table "What the agent did": AppAmbit | ShopList app.
+End with a table "What the agent did": AppAmbit | Grocelet app.
 ```
 
 ---
@@ -62,9 +62,9 @@ End with a table "What the agent did": AppAmbit | ShopList app.
 ## 2. The app: one list for the whole house
 
 ```text
-Build the ShopList Flutter app for iPhone and Android on AppAmbit. Follow AGENTS.md and match
+Build the Grocelet Flutter app for iPhone and Android on AppAmbit. Follow AGENTS.md and match
 DESIGN.md exactly (the "Fridge Door" look, fonts already in assets/fonts). App id
-com.kavaup.shoplist, display name ShopList, Android minSdk 24. Screens in English.
+com.kavaup.grocelet, display name Grocelet, Android minSdk 24. Screens in English.
 
 KEEP IT SIMPLE
 - No state-management packages: one controller per feature that extends ChangeNotifier, and
@@ -98,7 +98,7 @@ ANALYTICS
   No nicknames or item names in the events.
 
 Tests for the controllers, the item rules and the main screens, with fake repositories.
-flutter analyze clean. End with a table "What the agent did": AppAmbit | ShopList app.
+flutter analyze clean. End with a table "What the agent did": AppAmbit | Grocelet app.
 ```
 
 ---
@@ -106,7 +106,7 @@ flutter analyze clean. End with a table "What the agent did": AppAmbit | ShopLis
 ## 3. "I'm at the store"
 
 ```text
-Now the reason ShopList exists: telling the house you're at the store.
+Now the reason Grocelet exists: telling the house you're at the store.
 
 PUSH
 - Add appambit_sdk_push_notifications and start it right after the core SDK. On Android it
@@ -117,7 +117,7 @@ PUSH
   AppAmbit consumer id.
 - Ask for notifications once, politely, on the list: "Turn on notifications to know when
   someone is at the store." with Not now / Turn on. Never ask again.
-- A ShopList notification that arrives with the app open reloads the list. Tapping one opens it.
+- A Grocelet notification that arrives with the app open reloads the list. Tapping one opens it.
 
 THE BUTTON
 - Big denim "I'm at the store" button when nobody is shopping. It calls start_shopping.
@@ -136,5 +136,5 @@ ANALYTICS
 Tests for the New rules, the 3-hour rule, the trip and who got the alert. Then the real test
 with both phones: the iPhone taps "I'm at the store", the Android phone gets the notification
 and adds "milk", the iPhone pulls to refresh and sees "milk" with New. End with a table
-"What the agent did": AppAmbit | ShopList app.
+"What the agent did": AppAmbit | Grocelet app.
 ```
