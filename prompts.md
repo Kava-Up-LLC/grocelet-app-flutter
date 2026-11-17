@@ -63,33 +63,42 @@ End with a table "What the agent did": AppAmbit | ShopList app.
 
 ```text
 Build the ShopList Flutter app for iPhone and Android on AppAmbit. Follow AGENTS.md and match
-DESIGN.md exactly. App id com.kavaup.shoplist, display name ShopList. Screens in English.
+DESIGN.md exactly (the "Fridge Door" look, fonts already in assets/fonts). App id
+com.kavaup.shoplist, display name ShopList, Android minSdk 24. Screens in English.
 
 KEEP IT SIMPLE
 - No state-management packages: one controller per feature that extends ChangeNotifier, and
   views that rebuild with ListenableBuilder. No setState for app data.
-- Two features (house, list). All AppAmbit calls in one core folder.
+- Two features: house and list. Every AppAmbit call lives in lib/core/appambit/.
+- Packages: appambit_sdk_flutter, flutter_dotenv, shared_preferences, uuid. Nothing else.
 
 HOUSE BY CODE (no login)
+- Each phone gets a member id the first time it opens; that is how it's identified.
 - Welcome: "Create a house" or "Join with a code".
-- Create: your nickname, then the 6-letter code big with a Copy button.
-- Join: code + nickname. Wrong code: "No house with that code."
-- The phone remembers its house. Start AppAmbit with the key from .env.
+- Create: your nickname, then "Your house is ready" with the 6-letter code big and Copy code.
+- Join: code (capitals, letters only) + nickname. Wrong code:
+  "No house with that code. Check the 6 letters with whoever created it."
+- Both go through the join_house cloud function. The phone remembers its house.
+- Start AppAmbit with the iOS or Android key from .env.
 
 THE SHARED LIST
-- Add an item (name + optional quantity), check it off, swipe to delete.
-- "Clear checked" removes everything already bought.
+- Add an item (name + optional quantity), tap to check it off, swipe left to delete.
+- "Clear checked (n)" removes everything already bought.
+- Unchecked first, newest first. Each item shows a small magnet in the color of who added it.
 - Everyone in the house sees the same list: it reloads when the app opens, when it comes back
-  to the front, and on pull to refresh.
+  to the front, and on pull to refresh. Dates come from the database, not the phone.
+- Changes show at once; if they can't be saved, they're undone.
 
 ONLINE ONLY
 - No internet: a "No connection" banner with Retry. Nothing is saved for later.
+- Watch out: the AppAmbit Android SDK crashes on null SQL params. Write NULL in the SQL instead.
 
 ANALYTICS
 - house_created, house_joined, item_added, item_checked, item_deleted, checked_cleared.
+  No nicknames or item names in the events.
 
-Add tests for the controllers, run it on my iPhone and my Android phone, and check that an item
-added on one shows up on the other. End with a table "What the agent did": AppAmbit | ShopList app.
+Tests for the controllers, the item rules and the main screens, with fake repositories.
+flutter analyze clean. End with a table "What the agent did": AppAmbit | ShopList app.
 ```
 
 ---
