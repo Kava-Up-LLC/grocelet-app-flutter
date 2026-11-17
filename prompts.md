@@ -21,8 +21,13 @@ The app is built with **three prompts** sent to a coding agent (Claude Code) wit
 
 1. AppAmbit dashboard: create **App ShopList - ios** and **App ShopList - Android** (stack Flutter).
 2. Put both App Keys in `.env` (template `.env.example`). Never in the chat.
-3. Upload the push credentials to each app (App Info → Push Notifications Credentials): FCM service-account JSON
-   for Android, APNs `.p8` key for iOS. App id on both platforms: `com.kavaup.grocelet`.
+3. App id on both platforms: `com.kavaup.grocelet`.
+4. Android push: in Firebase, add an Android app with that package and download `google-services.json` to
+   `android/app/` (the app needs it, AppAmbit doesn't; it's git-ignored). Then Project settings → Service
+   accounts → **Generate new private key**, and upload that JSON to **App ShopList - Android** in AppAmbit.
+5. iOS push: in Apple Developer → Keys, create an APNs key with environment **Sandbox & Production** (so pushes
+   also reach builds run from Xcode), download the `.p8` once, and upload it to **App ShopList - ios** in AppAmbit
+   with its Key ID, your Team ID and the bundle id.
 
 ---
 
@@ -109,10 +114,16 @@ flutter analyze clean. End with a table "What the agent did": AppAmbit | Grocele
 Now the reason Grocelet exists: telling the house you're at the store.
 
 PUSH
-- Add appambit_sdk_push_notifications and start it right after the core SDK. On Android it
-  uses Firebase: apply the google-services plugin only when android/app/google-services.json
-  exists, so the app still builds without it. On iOS add the aps-environment entitlement and
-  the remote-notification background mode.
+- Add appambit_sdk_push_notifications and start it right after the core SDK, as its README says.
+- Android uses Firebase: add firebase-messaging (Firebase BoM) and apply the google-services
+  plugin only when android/app/google-services.json exists, so the app still builds without it.
+  Declare POST_NOTIFICATIONS for Android 13+.
+- iOS: Push Notifications capability, the remote-notification background mode, and
+  aps-environment = development in Debug and production in Release/TestFlight
+  (APS_ENVIRONMENT in Flutter/Debug.xcconfig and Release.xcconfig).
+- Watch out: on Android the OS permission alone doesn't make the device push-enabled in
+  AppAmbit. Call setNotificationsEnabled(true) when the permission is granted, and on every
+  start if it was already granted (for example from system Settings).
 - Each phone calls join_house again on every start, so start_shopping always has its current
   AppAmbit consumer id.
 - Ask for notifications once, politely, on the list: "Turn on notifications to know when
